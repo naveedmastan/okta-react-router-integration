@@ -7,40 +7,37 @@ import { OktaAuth } from '@okta/okta-auth-js';
 import oktaConfig from './oktaConfig';
 import HomePage from './pages/HomePage';
 import ProfilePage from './pages/ProfilePage';
-import LoginPage from './pages/LoginPage';
+import LoginPage from './pages/LoginPage'; // Import your LoginPage component
 
 const oktaAuth = new OktaAuth(oktaConfig);
 
-// ProtectedRoute component to redirect unauthenticated users to login
 const ProtectedRoute = () => {
   const { authState } = useOktaAuth();
-  
+
   if (!authState) {
-    // Still loading authState
     return <div>Loading...</div>;
   }
 
-  // Redirect to login if not authenticated
-  return authState.isAuthenticated ? <Outlet /> : <Navigate to="/login" />;
+  return authState.isAuthenticated ? <Outlet /> : <Navigate to="/okta-redirecturl/login/login.html" />;
 };
 
 // Router setup with protected routes
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <ProtectedRoute />, // Ensures all routes are protected
+    element: <ProtectedRoute />,
     children: [
       { path: '/', element: <HomePage /> },
       { path: '/profile', element: <ProfilePage /> },
     ],
   },
-  { path: '/login', element: <LoginPage /> },
+  { path: '/okta-redirecturl/login/login.html', element: <LoginPage /> }, // Login page with Okta widget
   { path: '/login/callback', element: <LoginCallback /> },
 ]);
 
 function App() {
   const restoreOriginalUri = async (_oktaAuth, originalUri) => {
-    window.location.replace(originalUri || '/');
+    window.location.replace(originalUri || '/okta-redirecturl/login/login.html');
   };
 
   return (
